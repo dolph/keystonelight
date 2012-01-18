@@ -4,7 +4,7 @@ set -eu
 
 function usage {
   echo "Usage: $0 [OPTION]..."
-  echo "Run KeystoneLight's test suite(s)"
+  echo "Run Keystone's test suite(s)"
   echo ""
   echo "  -V, --virtual-env        Always use virtualenv.  Install automatically if not present"
   echo "  -N, --no-virtual-env     Don't use virtualenv.  Run tests in local environment"
@@ -59,7 +59,7 @@ done
 
 # If enabled, tell nose to collect coverage data
 if [ $coverage -eq 1 ]; then
-    noseopts="$noseopts --with-coverage --cover-package=nova"
+    noseopts="$noseopts --with-coverage --cover-package=keystone"
 fi
 
 function run_tests {
@@ -86,11 +86,11 @@ function run_pep8 {
   ignore_dirs="*ajaxterm*"
   GLOBIGNORE="$ignore_scripts:$ignore_files:$ignore_dirs"
   srcfiles=`find bin -type f ! -name .*.swp`
-  srcfiles+=" keystonelight"
+  srcfiles+=" keystone"
   # Just run PEP8 in current environment
   ${wrapper} pep8 --repeat --show-pep8 --show-source \
     --ignore=E202,E111 \
-    --exclude=vcsversion.py ${srcfiles}
+    --exclude=vcsversion.py ${srcfiles} | tee pep8.txt
 }
 
 NOSETESTS="python run_tests.py $noseopts $noseargs"

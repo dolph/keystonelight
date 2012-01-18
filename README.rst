@@ -1,30 +1,75 @@
-Keystone Light
-==============
+Keystone
+========
 
-*Always Smooth*
-
-Keystone Light is a re-interpretation of the Keystone project that provides
-Identity, Token and Catalog services for use specifically by projects in the
-OpenStack family.
+Keystone is an OpenStack project that provides Identity, Token, Catalog and
+Policy services for use specifically by projects in the OpenStack family.
 
 Much of the design is precipitated from the expectation that the auth backends
 for most deployments will actually be shims in front of existing user systems.
+
+
+------------
+The Services
+------------
+
+Keystone is organized as a group of services exposed on one or many endpoints.
+Many of these services are used in a combined fashion by the frontend, for
+example an authenticate call will validate user/tenant credentials with the
+Identity service and, upon success, create and return a token with the Token
+service.
+
+
+Identity
+--------
+
+The Identity service provides auth credential validation and data about Users,
+Tenants and Roles, as well as any associated metadata.
+
+In the basic case all this data is managed by the service, allowing the service
+to manage all the CRUD associated with the data.
+
+In other cases, this data is pulled, by varying degrees, from an authoritative
+backend service. An example of this would be when backending on LDAP. See
+`LDAP Backend` below for more details.
+
+
+Token
+-----
+
+The Token service validates and manages Tokens used for authenticating requests
+once a user/tenant's credentials have already been verified.
+
+
+Catalog
+-------
+
+The Catalog service provides an endpoint registry used for endpoint discovery.
+
+
+Policy
+------
+
+The Policy service provides a rule-based authorization engine and the
+associated rule management interface.
+
 
 
 ----------
 Data Model
 ----------
 
-Keystone Light was designed from the ground up to be amenable to multiple
-styles of backends and as such many of the methods and data types will happily
-accept more data than they know what to do with and pass them on to a backend.
+Keystone was designed from the ground up to be amenable to multiple styles of
+backends and as such many of the methods and data types will happily accept
+more data than they know what to do with and pass them on to a backend.
 
 There are a few main data types:
 
  * **User**: has account credentials, is associated with one or more tenants
  * **Tenant**: unit of ownership in openstack, contains one or more users
+ * **Role**: a first-class piece of metadata associated with many user-tenant pairs.
  * **Token**: identifying credential associated with a user or user and tenant
- * **Extras**: bucket of key-values associated with a user-tenant pair, typically used to define roles.
+ * **Extras**: bucket of key-value metadata associated with a user-tenant pair.
+ * **Rule**: describes a set of requirements for performing an action.
 
 While the general data model allows a many-to-many relationship between Users
 and Tenants and a many-to-one relationship between Extras and User-Tenant pairs,
@@ -66,29 +111,6 @@ interpolation)::
   catalog.RegionOne.identity.internalURL = http://localhost:$(public_port)s/v2.0
   catalog.RegionOne.identity.name = 'Identity Service'
 
-
----------------
-Keystone Compat
----------------
-
-While Keystone Light takes a fundamentally different approach to its services
-from Keystone, a compatibility layer is included to make switching much easier
-for projects already attempting to use Keystone.
-
-The compatibility service is activated by defining an alternate application in
-the paste.deploy config and adding it to your main pipeline::
-
-  [app:keystone]
-  paste.app_factory = keystonelight.keystone_compat:app_factory
-
-Also relevant to Keystone compatibility are these sequence diagrams (openable
-with sdedit_)
-
-.. _sdedit: http://sourceforge.net/projects/sdedit/files/sdedit/4.0/
-
-Diagram: keystone_compat_flows.sdx_
-
-..  _: https://raw.github.com/termie/keystonelight/master/docs/keystone_compat_flows.sdx
 
 ----------------
 Approach to CRUD
@@ -175,10 +197,5 @@ then do what is effectively a 'Simple Match' style match against the creds.
 Still To Do
 -----------
 
- * Dev and testing setups would do well with some user/tenant/etc CRUD, for the
-   KVS backends at least.
- * Fixture loading functionality would also be killer tests and dev.
  * LDAP backend.
- * Keystone import.
- * (./) Admin-only interface
- * Don't check git checkouts as often, to speed up tests
+ * Diablo migration.

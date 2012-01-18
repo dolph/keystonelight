@@ -1,0 +1,12 @@
+*.pyc
+*.swp
+vendor
+.ksl-venv
+run_tests.log
+.coverage
+covhtml
+pep8.txt
+nosetests.xml
+bla.db
+docs/build
+.DS_Store

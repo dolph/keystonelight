@@ -5,10 +5,16 @@ eventlet==0.9.12
 PasteDeploy
 paste
 routes
+sqlalchemy
+sqlalchemy-migrate
 
 # keystonelight testing dependencies
 nose
+nosexcover
 
 # for python-keystoneclient
 httplib2
 pep8
+
+# for python-novaclient
+prettytable
